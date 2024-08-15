@@ -3,8 +3,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(project(":configuration"))
-    compileOnly("org.spongepowered:configurate-hocon:4.1.2")
+    compileOnly(project(":configuration", configuration = "shadow"))
 
     implementation("com.h2database:h2:2.1.214")
     implementation("io.ebean:ebean-core:12.15.0")

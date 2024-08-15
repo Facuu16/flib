@@ -3,19 +3,19 @@ package io.github.facuu16.flib.repository;
 import io.github.facuu16.flib.database.EbeanDatabase;
 import com.google.common.collect.Lists;
 import io.ebean.Database;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class EbeanRepository<E, T> implements AsyncRepository<E, T> {
 
-    protected final EbeanDatabase container;
-
-    protected final Database database = container.database();
+    protected final Database database;
 
     protected final Class<E> type = type();
+
+    public EbeanRepository(@NonNull EbeanDatabase container) {
+        this.database = container.database();
+    }
 
     @Override
     public <S extends E> S save(S entity) {

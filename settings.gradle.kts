@@ -1,4 +1,4 @@
-rootProject.name = "flib"
+rootProject.name = "core"
 include("storage")
 include("command")
 include("configuration")
