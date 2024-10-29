@@ -1,0 +1,5 @@
+expire-after: 30
+
+messages:
+  invalid: "<red>Invalid input!</red>"
+  expire: "<red>Canceling...</red>"

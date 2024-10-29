@@ -1,0 +1,6 @@
+help-command:
+  subcommand-template: '  <dark_gray>/<gray><command_name> <white><subcommand_name> <gray><subcommand_syntax>'
+  message-template:
+    - ''
+    - ' <dark_gray>Available Commands'
+    - ' <subcommands>'

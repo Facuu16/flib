@@ -1,3 +1,3 @@
 dependencies {
-    compileOnly("com.discordsrv:discordsrv:1.27.0")
+    compileOnlyApi("com.discordsrv:discordsrv:1.27.0")
 }

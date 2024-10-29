@@ -1,3 +1,3 @@
 dependencies {
-    compileOnly(project(":configuration", configuration = "shadow"))
+    compileOnly(project(":configuration"))
 }

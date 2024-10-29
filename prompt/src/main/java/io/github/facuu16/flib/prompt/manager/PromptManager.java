@@ -2,10 +2,8 @@ package io.github.facuu16.flib.prompt.manager;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.github.facuu16.flib.annotation.Component;
 import io.github.facuu16.flib.prompt.PendingPrompt;
 import io.github.facuu16.flib.prompt.configuration.PromptConfiguration;
-import io.github.facuu16.flib.prompt.configuration.PromptConfigurationContainer;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -16,7 +14,6 @@ import team.unnamed.inject.Inject;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
 @Accessors(fluent = true)
 public class PromptManager {
 
@@ -28,9 +25,7 @@ public class PromptManager {
     private static PromptManager instance;
 
     @Inject
-    private PromptManager(PromptConfigurationContainer container, BukkitAudiences audiences) {
-        final PromptConfiguration configuration = container.get();
-
+    private PromptManager(@NonNull PromptConfiguration configuration, @NonNull BukkitAudiences audiences) {
         this.prompts = Caffeine.newBuilder()
             .expireAfterWrite(configuration.expireAfter())
             .removalListener((id, prompt, cause) -> {

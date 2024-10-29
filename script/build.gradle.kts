@@ -1,3 +1,3 @@
 dependencies {
-    implementation("org.graalvm.js:js:20.3.0")
+    api("org.graalvm.js:js:20.3.0")
 }

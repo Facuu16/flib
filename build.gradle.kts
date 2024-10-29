@@ -9,12 +9,12 @@ repositories {
 }
 
 dependencies {
-    implementation("team.unnamed:inject:2.0.1")
-    implementation("io.github.classgraph:classgraph:4.8.174")
-    implementation("net.kyori:adventure-api:4.17.0")
-    implementation("net.kyori:adventure-text-minimessage:4.17.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.3.3")
-    implementation("com.github.ben-manes.caffeine:caffeine:2.9.3")
+    api("team.unnamed:inject:2.0.1")
+    api("io.github.classgraph:classgraph:4.8.174")
+    api("net.kyori:adventure-api:4.17.0")
+    api("net.kyori:adventure-text-minimessage:4.17.0")
+    api("net.kyori:adventure-platform-bukkit:4.3.3")
+    api("com.github.ben-manes.caffeine:caffeine:2.9.3")
 }
 
 allprojects {
