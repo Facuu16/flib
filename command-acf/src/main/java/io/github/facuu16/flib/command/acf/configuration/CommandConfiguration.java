@@ -8,6 +8,7 @@ import io.github.facuu16.flib.core.common.Updatable;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.configuration.InvalidConfigurationException;
 
@@ -31,9 +32,8 @@ public class CommandConfiguration extends YamlConfigurationFile {
     
     public Component helpMessage(@NonNull String parent, @NonNull Map<String, Collection<RegisteredCommand>> subcommands) {
         final TextComponent.Builder builder = Component.text();
-
         subcommands.forEach((key, commands)
-                -> commands.forEach(command -> builder.append(helpSubcommand(parent, key, command.getSyntaxText()))));
+                -> commands.forEach(command -> builder.append(helpSubcommand(parent, key, command.getSyntaxText())).appendNewline()));
         
         return component("help-command", "message-template", Placeholder.component("subcommands", builder.build()));
     }

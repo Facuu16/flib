@@ -13,6 +13,10 @@ public class TextPrompt<V> implements Prompt<String, V> {
     @NonNull
     Parser<String, V> parser;
 
+    public TextPrompt() {
+        this.parser = new DefaultTextParser<>();
+    }
+
     @Override
     public void send(@NonNull Player player, @NonNull PromptCallback<V> callback) {
         PromptManager.instance().prompts().put(player.getUniqueId(), new PendingPrompt<>(this, callback));

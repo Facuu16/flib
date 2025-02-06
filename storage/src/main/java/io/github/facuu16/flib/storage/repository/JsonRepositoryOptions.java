@@ -5,13 +5,17 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.github.facuu16.flib.storage.serializer.ColorDeserializer;
+import io.github.facuu16.flib.storage.serializer.ColorSerializer;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
+import java.awt.Color;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -19,12 +23,15 @@ import java.util.function.Consumer;
 @Builder
 @Accessors(fluent = true)
 public class JsonRepositoryOptions {
-    
+
     @Getter
     static ObjectMapper defaultMapper = new ObjectMapper()
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
             .enable(SerializationFeature.INDENT_OUTPUT)
-            .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE);
+            .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
+            .registerModule(new SimpleModule()
+                    .addSerializer(Color.class,new ColorSerializer())
+                    .addDeserializer(Color.class, new ColorDeserializer()));
     
     @NonNull
     Path folder;

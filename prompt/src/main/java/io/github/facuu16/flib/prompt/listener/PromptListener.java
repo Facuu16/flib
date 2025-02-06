@@ -38,13 +38,17 @@ public class PromptListener implements Listener {
             return;
         
         final I input = (I) event.getMessage();
-        
+
         if (!parser.canParse(input)) {
             audiences.player(player).sendMessage(configuration.invalidMessage());
             return;
         }
-        
-        pending.callback().apply(player, parser.parse(input));
+
+        try {
+            pending.callback().apply(player, parser.parse(input));
+        } catch (Exception exception) {
+            audiences.player(player).sendMessage(configuration.invalidMessage());
+        }
     }
 
 }

@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 import java.util.Optional;
 
-public interface Repository<M extends Model<T>, T> extends TypeHelper<M>, Updatable {
+public interface Repository<M extends Model<T>, T> extends Updatable {
     
     Optional<M> load(@NonNull T id);
     boolean save(@NonNull M model);

@@ -3,6 +3,7 @@ package io.github.facuu16.flib.storage.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import io.github.facuu16.flib.core.FlibApplication;
 import io.github.facuu16.flib.core.util.Paths;
 import io.github.facuu16.flib.storage.model.Model;
@@ -14,8 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +28,7 @@ import java.util.stream.StreamSupport;
 @Accessors(fluent = true)
 public class JsonRepository<M extends Model<String>> implements Repository<M, String> {
     
-    private final Class<M> type = type();
+    private final Class<M> type;
     
     private final Path folder;
     
@@ -37,16 +36,17 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     
     private final LoadingCache<String, M> cache;
     
-    public JsonRepository(@NonNull JsonRepositoryOptions options) {
+    public JsonRepository(@NonNull JsonRepositoryOptions options, @NonNull Class<M> type) {
         this.folder = Paths.ensure(Paths.Type.DIRECTORY, options.folder());
         this.mapper = options.mapper();
-        
+        this.type = type;
+
         final Caffeine<String, M> builder = Caffeine.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .removalListener((id, model, cause) -> {
-                    if (model == null || !model.getClass().equals(type))
+                    if (model == null || !model.getClass().equals(type) || cause == RemovalCause.EXPLICIT || cause == RemovalCause.REPLACED)
                         return;
-                    
+
                     save(model);
                 });
         
@@ -55,15 +55,18 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
         this.cache = builder.build(id -> load(id).orElse(null));
     }
     
-    public JsonRepository(@NonNull Path path) {
-        this(JsonRepositoryOptions.builder().folder(path).build());
+    public JsonRepository(@NonNull Path path, @NonNull Class<M> type) {
+        this(JsonRepositoryOptions.builder().folder(path).build(), type);
     }
-    
+
     @Override
     public CompletableFuture<Boolean> update() {
-        return CompletableFuture.supplyAsync(() -> true);
+        return CompletableFuture.supplyAsync(() -> {
+            refreshAll();
+            return true;
+        });
     }
-    
+
     @Override
     public CompletableFuture<Boolean> save() {
         return CompletableFuture.supplyAsync(() -> {
@@ -81,16 +84,13 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
         if (!file.exists())
             return Optional.empty();
         
-        if (file.length() <= 0) {
-            markAsInvalid(path);
+        if (file.length() <= 0)
             return Optional.empty();
-        }
         
         try {
             return Optional.ofNullable(mapper.readValue(file, type));
         } catch (IOException e) {
             FlibApplication.logger().log(Level.SEVERE, "Could not deserialize model '" + id + "'", e);
-            markAsInvalid(path);
             
             return Optional.empty();
         }
@@ -129,12 +129,12 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     
     @Override
     public M getById(@NonNull String id) {
-        return cache.getIfPresent(id);
+        return cache.get(id);
     }
     
     @Override
     public Optional<M> findById(@NonNull String id) {
-        return Optional.ofNullable(cache.getIfPresent(id));
+        return Optional.ofNullable(cache.get(id));
     }
     
     @Override
@@ -148,25 +148,21 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     
     @Override
     public Iterable<M> findAll() {
-        findAllIds().forEach(cache::refresh);
+        refreshAll();
         return cache.asMap().values();
     }
-    
+
     @Override
     public Iterable<String> findAllIds() {
-        final Set<String> ids = new HashSet<>();
-        
-        try (final Stream<Path> stream = Files.walk(folder)) {
-            stream.filter(path -> path.endsWith(".json"))
+        try (final Stream<Path> stream = Files.list(folder)) {
+            return stream.filter(path -> path.getFileName().toString().endsWith(".json"))
                     .map(path -> path.getFileName().toString().replace(".json", ""))
-                    .forEach(ids::add);
+                    .collect(Collectors.toSet());
         } catch (IOException e) {
-            FlibApplication.logger().log(Level.SEVERE, "Could not find all ids", e);
+            throw new RuntimeException(e);
         }
-        
-        return ids;
     }
-    
+
     @Override
     public void deleteById(@NonNull String id) {
         cache.invalidate(id);
@@ -200,7 +196,8 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     
     @Override
     public void refreshById(@NonNull String id) {
-        cache.refresh(id);
+        cache.invalidate(id);
+        cache.get(id);
     }
     
     @Override
@@ -220,7 +217,7 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     
     @Override
     public void refreshAll() {
-        findAllIds().forEach(cache::refresh);
+        findAllIds().forEach(cache::get);
     }
     
     @Override
@@ -236,16 +233,6 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     @Override
     public long count() {
         return ((Set<String>) findAllIds()).size();
-    }
-    
-    private void markAsInvalid(@NonNull Path file) {
-        try {
-            final Path invalid = Paths.ensure(Paths.Type.DIRECTORY, folder.resolve("invalid"));
-            
-            Files.move(file, invalid.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            FlibApplication.logger().log(Level.SEVERE, "Failed to move invalid file '" + file.getFileName() + "'", e);
-        }
     }
     
 }
