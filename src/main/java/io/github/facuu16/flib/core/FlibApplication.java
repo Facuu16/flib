@@ -39,11 +39,14 @@ public class FlibApplication {
 
     public static <V extends JavaPlugin> void run(@NonNull FlibOptions options) {
         final Class<V> main = (Class<V>) plugin.getClass();
-        
+
+        options.packages().add("io.github.facuu16.flib.*");
+        options.packages().add(main.getPackage().getName());
+
         try (
             final ScanResult result = new ClassGraph()
                 .enableAllInfo()
-                .acceptPackages(main.getPackage().getName(), "io.github.facuu16.flib.*")
+                .acceptPackages(options.packages().toArray(new String[0]))
                 .scan()
         ) {
             final Injector injector = Injector.create(

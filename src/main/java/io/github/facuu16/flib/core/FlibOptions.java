@@ -21,4 +21,7 @@ public class FlibOptions {
     @Singular
     Set<Class<?>> skips;
 
+    @Singular
+    Set<String> packages;
+
 }
