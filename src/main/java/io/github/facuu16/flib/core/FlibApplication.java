@@ -34,19 +34,21 @@ public class FlibApplication {
     private static LifecycleService lifecycle;
     
     public static void run() {
-        run(FlibOptions.builder().build());
+        run(FlibOptions.builder());
     }
 
-    public static <V extends JavaPlugin> void run(@NonNull FlibOptions options) {
+    public static <V extends JavaPlugin> void run(@NonNull FlibOptions.FlibOptionsBuilder builder) {
         final Class<V> main = (Class<V>) plugin.getClass();
 
-        options.packages().add("io.github.facuu16.flib.*");
-        options.packages().add(main.getPackage().getName());
+        builder.target("io.github.facuu16.flib.*");
+        builder.target(main.getPackage().getName());
+
+        final FlibOptions options = builder.build();
 
         try (
             final ScanResult result = new ClassGraph()
                 .enableAllInfo()
-                .acceptPackages(options.packages().toArray(new String[0]))
+                .acceptPackages(options.targets().toArray(new String[0]))
                 .scan()
         ) {
             final Injector injector = Injector.create(
