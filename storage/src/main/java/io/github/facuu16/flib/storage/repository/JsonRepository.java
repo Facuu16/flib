@@ -217,7 +217,7 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     
     @Override
     public void refreshAll() {
-        findAllIds().forEach(cache::get);
+        findAllIds().forEach(this::refreshById);
     }
     
     @Override
