@@ -9,6 +9,7 @@ import io.github.facuu16.flib.core.service.LifecycleService;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import lombok.experimental.UtilityClass;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import team.unnamed.inject.Inject;
@@ -21,23 +22,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+@UtilityClass
 @Accessors(fluent = true)
 public class FlibApplication {
     
     @Getter
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     
     @Getter
-    private static final JavaPlugin plugin = JavaPlugin.getProvidingPlugin(FlibApplication.class);
+    private final JavaPlugin plugin = JavaPlugin.getProvidingPlugin(FlibApplication.class);
     
     @Inject
-    private static LifecycleService lifecycle;
+    private LifecycleService lifecycle;
     
-    public static void run() {
+    public void run() {
         run(FlibOptions.builder());
     }
 
-    public static <V extends JavaPlugin> void run(@NonNull FlibOptions.FlibOptionsBuilder builder) {
+    public <V extends JavaPlugin> void run(@NonNull FlibOptions.FlibOptionsBuilder builder) {
         final Class<V> main = (Class<V>) plugin.getClass();
 
         builder.target("io.github.facuu16.flib.*");
@@ -76,15 +78,15 @@ public class FlibApplication {
         }
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         lifecycle.stop().join();
     }
     
-    public static Logger logger() {
+    public Logger logger() {
         return plugin.getLogger();
     }
 
-    public static Path folder() {
+    public Path folder() {
         return plugin.getDataFolder().toPath();
     }
 

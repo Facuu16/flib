@@ -9,11 +9,14 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.facuu16.flib.storage.serializer.ColorDeserializer;
 import io.github.facuu16.flib.storage.serializer.ColorSerializer;
+import io.github.facuu16.flib.storage.serializer.ItemStackDeserializer;
+import io.github.facuu16.flib.storage.serializer.ItemStackSerializer;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import org.bukkit.inventory.ItemStack;
 
 import java.awt.Color;
 import java.nio.file.Path;
@@ -31,7 +34,9 @@ public class JsonRepositoryOptions {
             .setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
             .registerModule(new SimpleModule()
                     .addSerializer(Color.class,new ColorSerializer())
-                    .addDeserializer(Color.class, new ColorDeserializer()));
+                    .addDeserializer(Color.class, new ColorDeserializer())
+                    .addSerializer(ItemStack.class, new ItemStackSerializer())
+                    .addDeserializer(ItemStack.class, new ItemStackDeserializer()));
     
     @NonNull
     Path folder;
