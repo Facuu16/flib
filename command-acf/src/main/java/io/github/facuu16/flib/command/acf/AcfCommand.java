@@ -24,9 +24,8 @@ public class AcfCommand extends AbstractCommand {
     @Subcommand("settings")
     public void settings(@NonNull CommandSender sender) {
         audiences.sender(sender).sendMessage(Component.text("Reloading settings...", NamedTextColor.DARK_GRAY));
-        configuration.update().thenAccept(result -> audiences.sender(sender).sendMessage(
-                result ? Component.text("Settings reloaded!", NamedTextColor.GREEN) : Component.text("Could not reload settings!", NamedTextColor.RED)
-        )).join();
+        configuration.update();
+        audiences.sender(sender).sendMessage(Component.text("Settings reloaded!", NamedTextColor.GREEN));
     }
 
 }

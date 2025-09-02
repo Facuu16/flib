@@ -5,7 +5,6 @@ import io.github.facuu16.flib.core.common.Lifecycle;
 import team.unnamed.inject.Inject;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Bind
 public class LifecycleService implements Service {
@@ -14,13 +13,13 @@ public class LifecycleService implements Service {
     private Set<Lifecycle> lifecycles;
     
     @Override
-    public CompletableFuture<Void> start() {
-        return allOf(lifecycles.stream().map(Lifecycle::start));
+    public void start() {
+        lifecycles.forEach(Lifecycle::start);
     }
     
     @Override
-    public CompletableFuture<Void> stop() {
-        return allOf(lifecycles.stream().map(Lifecycle::stop));
+    public void stop() {
+        lifecycles.forEach(Lifecycle::stop);
     }
     
 }

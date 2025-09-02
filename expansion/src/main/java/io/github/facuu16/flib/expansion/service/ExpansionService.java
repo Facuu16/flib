@@ -8,7 +8,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import team.unnamed.inject.Inject;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Bind(to = Lifecycle.class)
 public class ExpansionService implements Service {
@@ -17,13 +16,13 @@ public class ExpansionService implements Service {
     private Set<PlaceholderExpansion> expansions;
 
     @Override
-    public CompletableFuture<Void> start() {
-        return CompletableFuture.runAsync(() -> expansions.forEach(expansion -> {
+    public void start() {
+        expansions.forEach(expansion -> {
             if (expansion.canRegister()) {
                 expansion.register();
                 FlibApplication.logger().info("Registered expansion '" + expansion.getIdentifier() + "' (PlaceholderAPI)");
             }
-        }));
+        });
     }
     
 }

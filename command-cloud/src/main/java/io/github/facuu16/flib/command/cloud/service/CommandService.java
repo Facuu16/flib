@@ -8,7 +8,6 @@ import io.github.facuu16.flib.core.service.Service;
 import team.unnamed.inject.InjectAll;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @InjectAll
 @Bind(to = Lifecycle.class)
@@ -19,8 +18,8 @@ public class CommandService implements Service {
     private CommandManager manager;
     
     @Override
-    public CompletableFuture<Void> start() {
-        return CompletableFuture.runAsync(() -> manager.annotationParser().parse(commands));
+    public void start() {
+        manager.annotationParser().parse(commands);
     }
     
 }

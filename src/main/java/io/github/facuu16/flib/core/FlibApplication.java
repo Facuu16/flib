@@ -18,17 +18,12 @@ import team.unnamed.inject.Injector;
 
 import java.nio.file.Path;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 @UtilityClass
 @Accessors(fluent = true)
 public class FlibApplication {
-    
-    @Getter
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    
+
     @Getter
     private final JavaPlugin plugin = JavaPlugin.getProvidingPlugin(FlibApplication.class);
     
@@ -74,12 +69,12 @@ public class FlibApplication {
                     .forEach(injector::injectStaticMembers);
             
             injector.injectMembers(injector.getInstance(main));
-            lifecycle.start().join();
+            lifecycle.start();
         }
     }
 
     public void shutdown() {
-        lifecycle.stop().join();
+        lifecycle.stop();
     }
     
     public Logger logger() {

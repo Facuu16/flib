@@ -11,7 +11,6 @@ import team.unnamed.inject.Inject;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Bind(to = Lifecycle.class)
 public class DiscordService implements Service {
@@ -20,17 +19,15 @@ public class DiscordService implements Service {
     private Set<DiscordCommand> commands;
 
     @Override
-    public CompletableFuture<Void> start() {
-        return CompletableFuture.runAsync(() -> {
-            final Set<PluginSlashCommand> commands = new HashSet<>();
-            
-            this.commands.forEach(command -> {
-                commands.add(new PluginSlashCommand(FlibApplication.plugin(), command.data(), command.guilds()));
-                FlibApplication.logger().info("Registered discord command '" + command.data().getName() + "'");
-            });
-            
-            DiscordSRV.api.addSlashCommandProvider(() -> commands);
+    public void start() {
+        final Set<PluginSlashCommand> commands = new HashSet<>();
+
+        this.commands.forEach(command -> {
+            commands.add(new PluginSlashCommand(FlibApplication.plugin(), command.data(), command.guilds()));
+            FlibApplication.logger().info("Registered discord command '" + command.data().getName() + "'");
         });
+
+        DiscordSRV.api.addSlashCommandProvider(() -> commands);
     }
 
 }

@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 @Data
@@ -53,29 +52,25 @@ public class YamlConfigurationFile extends YamlConfiguration implements Configur
     }
     
     @Override
-    public CompletableFuture<Boolean> update() {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                load(file);
-                return true;
-            } catch (Exception e) {
-                FlibApplication.logger().log(Level.SEVERE, "Could not reload '" + file.getName() + "' yaml file", e);
-                return false;
-            }
-        });
+    public boolean update() {
+        try {
+            load(file);
+            return true;
+        } catch (Exception e) {
+            FlibApplication.logger().log(Level.SEVERE, "Could not reload '" + file.getName() + "' yaml file", e);
+            return false;
+        }
     }
     
     @Override
-    public CompletableFuture<Boolean> save() {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                save(file);
-                return true;
-            } catch (Exception e) {
-                FlibApplication.logger().log(Level.SEVERE, "Could not save '" + file.getName() + "' yaml file", e);
-                return false;
-            }
-        });
+    public boolean save() {
+        try {
+            save(file);
+            return true;
+        } catch (Exception e) {
+            FlibApplication.logger().log(Level.SEVERE, "Could not save '" + file.getName() + "' yaml file", e);
+            return false;
+        }
     }
     
     public <T> T getOrDefault(@NonNull String section, @NonNull String key, @NonNull T value) {

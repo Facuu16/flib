@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 @Data
@@ -34,34 +33,30 @@ public class PropertiesConfigurationFile extends Properties implements Configura
     @Override
     public void copyDefaults(@NonNull InputStream input) throws IOException {
         load(input);
-        save().join();
+        save();
     }
     
     @Override
-    public CompletableFuture<Boolean> update() {
-        return CompletableFuture.supplyAsync(() -> {
-            try (final Reader reader = new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8)) {
-                clear();
-                load(reader);
-                return true;
-            } catch (IOException e) {
-                FlibApplication.logger().log(Level.SEVERE, "Could not reload '" + file.getName() + "' properties file", e);
-                return false;
-            }
-        });
+    public boolean update() {
+        try (final Reader reader = new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8)) {
+            clear();
+            load(reader);
+            return true;
+        } catch (IOException e) {
+            FlibApplication.logger().log(Level.SEVERE, "Could not reload '" + file.getName() + "' properties file", e);
+            return false;
+        }
     }
     
     @Override
-    public CompletableFuture<Boolean> save() {
-        return CompletableFuture.supplyAsync(() -> {
-            try (final Writer writer = new OutputStreamWriter(Files.newOutputStream(file.toPath()), StandardCharsets.UTF_8)) {
-                store(writer, null);
-                return true;
-            } catch (IOException e) {
-                FlibApplication.logger().log(Level.SEVERE, "Could not save '" + file.getName() + "' properties file", e);
-                return false;
-            }
-        });
+    public boolean save() {
+        try (final Writer writer = new OutputStreamWriter(Files.newOutputStream(file.toPath()), StandardCharsets.UTF_8)) {
+            store(writer, null);
+            return true;
+        } catch (IOException e) {
+            FlibApplication.logger().log(Level.SEVERE, "Could not save '" + file.getName() + "' properties file", e);
+            return false;
+        }
     }
     
 }

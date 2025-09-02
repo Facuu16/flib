@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -60,20 +59,16 @@ public class JsonRepository<M extends Model<String>> implements Repository<M, St
     }
 
     @Override
-    public CompletableFuture<Boolean> update() {
-        return CompletableFuture.supplyAsync(() -> {
-            refreshAll();
-            return true;
-        });
+    public boolean update() {
+        refreshAll();
+        return true;
     }
 
     @Override
-    public CompletableFuture<Boolean> save() {
-        return CompletableFuture.supplyAsync(() -> {
-            FlibApplication.logger().info("Saving " + cache.estimatedSize() + " objects in cache for repository '" + getClass().getSimpleName() + "'...");
-            cache.asMap().forEach((id, model) -> save(model));
-            return true;
-        });
+    public boolean save() {
+        FlibApplication.logger().info("Saving " + cache.estimatedSize() + " objects in cache for repository '" + getClass().getSimpleName() + "'...");
+        cache.asMap().forEach((id, model) -> save(model));
+        return true;
     }
     
     @Override

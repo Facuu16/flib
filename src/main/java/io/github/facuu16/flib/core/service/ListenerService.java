@@ -9,7 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import team.unnamed.inject.Inject;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Bind(to = Lifecycle.class)
 public class ListenerService implements Service {
@@ -18,19 +17,17 @@ public class ListenerService implements Service {
     private Set<Listener> listeners;
 
     @Override
-    public CompletableFuture<Void> start() {
-        return CompletableFuture.runAsync(() -> {
-            final JavaPlugin plugin = FlibApplication.plugin();
-            
-            listeners.forEach(listener -> plugin.getServer()
-                    .getPluginManager()
-                    .registerEvents(listener, plugin));
-        });
+    public void start() {
+        final JavaPlugin plugin = FlibApplication.plugin();
+
+        listeners.forEach(listener -> plugin.getServer()
+                .getPluginManager()
+                .registerEvents(listener, plugin));
     }
 
     @Override
-    public CompletableFuture<Void> stop() {
-        return CompletableFuture.runAsync(() -> listeners.forEach(HandlerList::unregisterAll));
+    public void stop() {
+        listeners.forEach(HandlerList::unregisterAll);
     }
 
 }
